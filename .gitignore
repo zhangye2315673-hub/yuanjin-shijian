@@ -1,0 +1,4 @@
+node_modules/
+__pycache__/
+*.bak.js
+.DS_Store

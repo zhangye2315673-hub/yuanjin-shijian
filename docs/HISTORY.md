@@ -1,0 +1,18 @@
+# Version history (condensed from project skill, 2026-10-13)
+- v2–v9 (10-12): hand-built faceted scene, UI final = 时光罗盘+远近刻度尺 (ui-10schemes.bak.html archived), atmosphere passes, NaN/black-blob fixes (cryMat unlit, shader NaN guards, button[data-speed] click fix), theme pass (RIGHT island = far "then", sepia, scaled .78).
+- v10: jointed hand-built chars (chars.js), split-tone post grade, intro dolly.
+- v11/v11b: Tripo heroes girl/gma/house embedded (window.__GLB + __TEX data URIs, JS dequantize), instanced wind grass, SWAY[].
+- v12: 10 Tripo props via PROPS[] + fit(); low-poly puff clouds; far ridges removed; fog 48–128.
+- v13: real world-fixed sun arc setSun(k) (k0 overhead→k1 sunset), stepSun auto loop ~180s, __sun(k); sun disc/halo/post glow removed; Tripo ytree/flowers/gull.
+- v13b: crystal tree removed (crystal.visible=false).
+- v14: Tripo sign + kite; birds flap via per-bird CPU wing deform, heading lookAt + bank; #tod time slider in ui.html. NOTE: publisher appended its own 自动-button script to the published index.html (toggles 自动/暂停); not in our source — reconcile on next publish.
+- v16 (2026-10-13 15:24): removed drifting pebbles under islands; LEFT scale 1.1, RIGHT 0.64; RIGHT rock = new Tripo rockC (spiky stalactites, H*1.45); #todA 44px on touch. Published files/yuanjin-v16.html.
+- v17 (2026-10-13): unified figure scale (user: girl too big). LEFT 1.0, RIGHT 0.82, bench x0.75, girl x0.72. Islands differ by radius (caps 10.8 vs 8.0).
+- v18 (2026-10-13 16:15): Zuco hand-painted grass tile (/workspace/work/tex/grass_tile.jpg, window.__GRASS) on caps; addRimGrass() instanced cone fringe; leafy vines (leafGeo); smooth puffy clouds (SphereGeometry puff).
+- v19 (2026-10-13 16:50): meadow fills coastline (outline-based), blades 0.07-0.17 tall, edge blades droop outward with wind; rim cone fringe removed; flat patches removed; Tripo stone + leaves props (PROPS k stone/leaves, wd width-fit); rockC yaw fixed 0 (hides painted root rings); #todA 44px always.
+- v20 (2026-10-13 17:05): user: full meadow + grass texture too realistic/ugly, wants clean low-poly ground. Cap = flat toon 0xd9b446 (no texture, __GRASS dropped from build); meadow = ~50/32 sparse chunky tufts (3-5 wide blades, bw .075, h .11-.2); no edge blades.
+- v21 (2026-10-13 18:00): Tripo grass tuft (props/grass_q.glb) instanced on ~2/3 of tuft spots, height ~0.18-0.24; code cone tufts + meadow blades off when GLB present; ground GROUND_COL 0xcda552 warm champagne (was 0xd9b446).
+- v22 (2026-10-13 18:40): irregular coastline via coast(o.bumps) gaussian capes/bays (LEFT 5, RIGHT 5 bumps); Tripo clod (props/clod_q.glb) chunks tucked under rim, LEFT 6 RIGHT 4, warm tint.
+- v23 (2026-10-13 19:35): LEFT back crescent terrace (island o.terrace a1..a2, h 0.36, cliff 0xc8875a); WATER IIFE: toon pond (1.95,-0.55), stream ribbon to rim, waterfall ribbon (flowMat scroll streaks, edge foam, fade), mist puffs, droplet Points; WATER.avoid keeps tufts/props out; groundY() raycast for tuft heights.
+- v24 (2026-10-13 20:40): wider fall (0.68+0.55t), stronger moving white dashes/chevrons on stream+fall, pond flow lines drift to outlet, RIGHT terrace a 2.1..3.55 h0.3.
+- v25 (2026-10-14 00:12): 16.4MB->8.2MB via meshopt GLBs (tripo/m, bundle/squeeze.mjs), textures stripped from GLB, MeshoptDecoder in gltf.iife.js.

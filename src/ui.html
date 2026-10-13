@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>远近即时间 · UI 方案对比</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#f4b98f;font-family:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c:active{cursor:grabbing}
+#hud *{box-sizing:border-box}
+:where(#hud) button{all:unset;cursor:pointer;box-sizing:border-box}
+#hud>div>*{position:fixed;user-select:none}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.glass{background:rgba(255,255,255,.24);border:1px solid rgba(255,255,255,.6);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);box-shadow:0 10px 30px rgba(120,60,60,.15),inset 0 1px 0 rgba(255,255,255,.8)}
+@keyframes spin{to{transform:rotate(-360deg)}}
+@keyframes bob{50%{transform:translateY(-4px)}}
+
+
+/* ===== 时光罗盘 + 远近刻度（定稿） ===== */
+.cn{width:30px;height:30px;border:0 solid rgba(255,255,255,.55);pointer-events:none}
+.cn.a{top:18px;left:18px;border-width:2px 0 0 2px;border-radius:8px 0 0 0}.cn.b{top:18px;right:18px;border-width:2px 2px 0 0;border-radius:0 8px 0 0}
+.cn.c{bottom:18px;left:18px;border-width:0 0 2px 2px;border-radius:0 0 0 8px}.cn.d{bottom:18px;right:18px;border-width:0 2px 2px 0;border-radius:0 0 8px 0}
+.badge{top:34px;left:34px;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;color:#4a3530;text-align:center}
+.badge::before{content:"";position:absolute;inset:6px;border-radius:50%;background:conic-gradient(#ff9a5c 0 62%,rgba(255,255,255,.35) 0);-webkit-mask:radial-gradient(circle,transparent 58%,#000 60%);mask:radial-gradient(circle,transparent 58%,#000 60%)}
+.badge b{display:block;font-size:34px;line-height:1;font-weight:700}.badge span{font-size:12px;letter-spacing:.2em;opacity:.85}
+.info{top:72px;left:152px;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:12px;letter-spacing:.12em;color:#6a3a35;display:flex;align-items:center;gap:8px}
+.info .dot{width:7px;height:7px;border-radius:50%;background:#ffb36b;box-shadow:0 0 8px #ffb36b}
+.ruler{top:50%;right:34px;width:78px;height:300px;margin-top:-190px;border-radius:39px;color:#4a3530}
+.ruler .tk{position:absolute;right:14px;top:28px;bottom:28px;width:12px;background:repeating-linear-gradient(rgba(74,53,48,.35) 0 1px,transparent 1px 12px)}
+.ruler .tk::before{content:"";position:absolute;right:0;top:0;bottom:0;width:20px;background:repeating-linear-gradient(rgba(74,53,48,.55) 0 1.5px,transparent 1.5px 61px)}
+.ruler .end{position:absolute;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.3em;opacity:.55}
+.ruler .end.t{top:8px}.ruler .end.btm{bottom:8px}
+.ruler button{position:absolute;left:8px;width:44px;transform:translateY(-50%);text-align:center;font-size:12px;line-height:1.25;color:rgba(74,53,48,.55);padding:6px 0;border-radius:12px;transition:.25s}
+.ruler button small{display:block;font-size:10px;opacity:.75}
+.ruler button.on{color:#e8743b;font-weight:700;background:rgba(255,255,255,.6)}
+.ruler .p1{top:22%}.ruler .p2{top:50%}.ruler .p3{top:78%}
+.ruler .mk{position:absolute;right:30px;top:50%;margin-top:-6px;border:6px solid transparent;border-right:9px solid #ff8a5c;transition:top .45s cubic-bezier(.4,1.5,.5,1)}
+body[data-speed=slow] .ruler .mk{top:22%}body[data-speed=fast] .ruler .mk{top:78%}
+.dial{right:34px;bottom:34px;width:210px;height:210px;border-radius:50%;color:#4a3530}
+.dial svg.arc{position:absolute;inset:0;width:100%;height:100%}
+.dial button{position:absolute;width:52px;height:52px;margin:-26px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:rgba(74,53,48,.6)}
+.dial button.on{color:#e8743b;font-weight:700}
+.dial .b1{left:22%;top:34%}.dial .b2{left:50%;top:17%}.dial .b3{left:78%;top:34%}
+.needle{position:absolute;left:50%;top:50%;width:4px;height:62px;margin-left:-2px;margin-top:-62px;border-radius:4px;background:linear-gradient(#ff8a5c,rgba(255,138,92,.2));transform-origin:50% 100%;transition:transform .5s cubic-bezier(.4,1.6,.5,1)}
+body[data-speed=slow] .needle{transform:rotate(-58deg)}body[data-speed=fast] .needle{transform:rotate(58deg)}
+body.rew .needle{transform:rotate(-120deg)}
+.core{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-18px 0 0 -38px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;gap:1px;background:rgba(255,255,255,.6);box-shadow:0 4px 14px rgba(0,0,0,.1);cursor:pointer}
+.core .x{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;font-weight:600;color:#e8743b}
+.core .x::after{content:"× 1.0"}body[data-speed=slow] .core .x::after{content:"× 0.3"}body[data-speed=fast] .core .x::after{content:"× 3.0"}body.rew .core .x::after{content:"◀◀"}
+body.rew .core{background:#ff8a5c;color:#fff}body.rew .core .x{color:#fff}body.rew .core .ic{animation:spin 1s linear infinite}
+.hint{left:38px;bottom:38px;color:#5a3b36;max-width:340px;padding:12px 20px 12px 14px;border-radius:18px;background:rgba(255,255,255,.32);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6)}
+.hint .ic{color:#5aae6e}
+.hint h3{margin:0 0 4px;font-size:16px;display:flex;gap:6px;align-items:center}.hint p{margin:0;font-size:12px;opacity:.92;padding-left:28px}
+#dev{display:none}
+#hud>div>*{zoom:.7}
+.glass{background:rgba(255,255,255,.18)}
+@media (max-width:640px){
+ #hud>div>*{zoom:.56}
+ .info{display:none}
+ .ruler{margin-top:-240px}
+}
+#tod{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:7px 12px 7px 14px;border-radius:999px;background:rgba(255,248,244,.38);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.55);box-shadow:0 4px 18px rgba(120,70,90,.15);font:12px/1 "Noto Sans SC",system-ui,sans-serif;color:#6a3a35;z-index:20;user-select:none}
+#tod span{opacity:.8;white-space:nowrap}
+#todR{-webkit-appearance:none;appearance:none;width:150px;height:4px;border-radius:4px;background:linear-gradient(90deg,#9cc8ee 0%,#ffd9a0 18%,#ff9d6a 25%,#2a3166 42%,#141a3e 50%,#2a3166 62%,#f5a7a0 75%,#bfe0f4 100%);outline:none;margin:0}
+#todR::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #e8956a;box-shadow:0 1px 4px rgba(0,0,0,.2);cursor:pointer}
+#todR::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #e8956a;cursor:pointer}
+#todA{all:unset;cursor:pointer;padding:4px 10px;min-height:44px;line-height:44px;min-width:44px;text-align:center;box-sizing:border-box;border-radius:999px;border:1px solid rgba(106,58,53,.3);color:#6a3a35;font-size:12px}@media(pointer:coarse){#todA{min-height:44px;line-height:44px;min-width:44px;text-align:center}}
+#todA.on{background:#6a3a35;color:#fff8f2;border-color:#6a3a35}
+@media(max-width:600px){#tod{bottom:12px;gap:7px;padding:6px 10px}#todR{width:110px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <symbol id="i-slow" viewBox="0 0 24 24"><path d="M8 7l-4 5 4 5M14 7l-4 5 4 5"/></symbol>
+ <symbol id="i-norm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol>
+ <symbol id="i-fast" viewBox="0 0 24 24"><path d="M10 7l4 5-4 5M16 7l4 5-4 5"/></symbol>
+ <symbol id="i-rew" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4h4"/></symbol>
+ <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></symbol>
+ <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-8"/><path d="M12 13c0-4-3-6-7-6 0 4 3 6 7 6zM12 11c0-4 3-6 7-6 0 4-3 6-7 6z"/></symbol>
+ <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 1 1 9.5 5a6 6 0 0 0 9.5 9.5z"/></symbol>
+</svg>
+<canvas id="c"></canvas>
+<div id="hud"><div>
+ <div class="cn a"></div><div class="cn b"></div><div class="cn c"></div><div class="cn d"></div>
+ <div class="glass badge"><div><b>7</b><span>第七年 · 秋</span></div></div>
+ <div class="info"><span class="dot"></span>Y07 · 黄昏 17:42</div>
+</div></div>
+<div id="tod"><span>正午</span><input type="range" id="todR" min="0" max="1" step="0.002" value="0.18"><span>清晨</span><button id="todA" class="on">自动</button></div>
+<div id="dev"><input type="checkbox" id="outline" checked><input type="checkbox" id="tilt" checked><input type="range" id="sun" min="0" max="1" step="0.01" value="0.82"></div>
+<!--THREE-->
+<!--SCENE-->
+</body>
+</html>
